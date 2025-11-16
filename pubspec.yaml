@@ -40,28 +40,12 @@ dependencies:
   
   # Utilities
   get_it: ^7.6.4
-  connectivity_plus: ^5.0.2
   url_launcher: ^6.2.2
-  image_picker: ^1.0.5
-  file_picker: ^6.1.1
   path_provider: ^2.1.1
-  permission_handler: ^11.1.0
-  
-  # Video Player
-  video_player: ^2.8.1
-  chewie: ^1.7.4
-  
-  # PDF
-  pdf: ^3.10.7
-  printing: ^5.11.1
   
   # HTTP
   http: ^1.1.2
   dio: ^5.4.0
-  
-  # Location
-  geolocator: ^10.1.0
-  geocoding: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -79,13 +63,13 @@ flutter:
     - assets/animations/
     - assets/logos/
   
-  fonts:
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
+  # fonts:
+  #   - family: Poppins
+  #     fonts:
+  #       - asset: assets/fonts/Poppins-Regular.ttf
+  #       - asset: assets/fonts/Poppins-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Poppins-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Poppins-Bold.ttf
+  #         weight: 700

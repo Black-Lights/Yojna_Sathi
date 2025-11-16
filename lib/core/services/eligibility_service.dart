@@ -1,5 +1,5 @@
-import '../profile/data/models/user_profile.dart';
-import '../schemes/data/models/scheme.dart';
+import '../../features/profile/data/models/user_profile.dart';
+import '../../features/schemes/data/models/scheme.dart';
 
 class EligibilityResult {
   final bool isEligible;

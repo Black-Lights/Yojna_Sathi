@@ -89,7 +89,7 @@ class AppRouter {
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationsPage());
       
-      case settings:
+      case AppRouter.settings:
         return MaterialPageRoute(builder: (_) => const SettingsPage());
       
       default:
