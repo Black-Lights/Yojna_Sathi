@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../profile/data/models/user_profile.dart';
@@ -18,6 +21,10 @@ class _ProfileCreatePageState extends State<ProfileCreatePage> {
   final _nameController = TextEditingController();
   final _ageController = TextEditingController();
   final _phoneController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+  File? _selectedImage;
+  String? _uploadedImageUrl;
+  bool _isUploadingImage = false;
 
   String _selectedGender = 'M';
   String _selectedIncome = AppConstants.incomeRanges[0];
@@ -36,7 +43,68 @@ class _ProfileCreatePageState extends State<ProfileCreatePage> {
     super.dispose();
   }
 
-  void _handleSubmit() {
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+        await _uploadProfilePhoto();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to pick image: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _uploadProfilePhoto() async {
+    if (_selectedImage == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('${user.uid}.jpg');
+
+      await storageRef.putFile(_selectedImage!);
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      setState(() {
+        _uploadedImageUrl = downloadUrl;
+        _isUploadingImage = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile photo uploaded!')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isUploadingImage = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload photo: $e')),
+        );
+      }
+    }
+  }
+
+  void _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
@@ -48,6 +116,7 @@ class _ProfileCreatePageState extends State<ProfileCreatePage> {
         gender: _selectedGender,
         email: user.email ?? '',
         phone: _phoneController.text.trim(),
+        photoUrl: _uploadedImageUrl,
         income: _selectedIncome,
         occupation: _selectedOccupation,
         category: _selectedCategory,
@@ -89,6 +158,47 @@ class _ProfileCreatePageState extends State<ProfileCreatePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: _selectedImage != null
+                            ? FileImage(_selectedImage!)
+                            : null,
+                        child: _selectedImage == null && !_isUploadingImage
+                            ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                            : null,
+                      ),
+                      if (_isUploadingImage)
+                        const Positioned.fill(
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          child: IconButton(
+                            icon: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                            onPressed: _isUploadingImage ? null : _pickImage,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Add Profile Photo (Optional)',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
                 Text(
                   'Complete your profile to get personalized scheme recommendations',
                   style: Theme.of(context).textTheme.titleMedium,

@@ -8,6 +8,7 @@ class UserProfile extends Equatable {
   final String gender;
   final String email;
   final String phone;
+  final String? photoUrl;
   final String income;
   final String occupation;
   final String category;
@@ -24,6 +25,7 @@ class UserProfile extends Equatable {
     required this.gender,
     required this.email,
     required this.phone,
+    this.photoUrl,
     required this.income,
     required this.occupation,
     required this.category,
@@ -46,6 +48,7 @@ class UserProfile extends Equatable {
       gender: profile['gender'] as String,
       email: profile['email'] as String,
       phone: profile['phone'] as String,
+      photoUrl: profile['photoUrl'] as String?,
       income: profile['income'] as String,
       occupation: profile['occupation'] as String,
       category: profile['category'] as String,
@@ -72,6 +75,7 @@ class UserProfile extends Equatable {
         'gender': gender,
         'email': email,
         'phone': phone,
+        if (photoUrl != null) 'photoUrl': photoUrl,
         'income': income,
         'occupation': occupation,
         'category': category,
@@ -97,6 +101,7 @@ class UserProfile extends Equatable {
     String? gender,
     String? email,
     String? phone,
+    String? photoUrl,
     String? income,
     String? occupation,
     String? category,
@@ -113,6 +118,7 @@ class UserProfile extends Equatable {
       gender: gender ?? this.gender,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      photoUrl: photoUrl ?? this.photoUrl,
       income: income ?? this.income,
       occupation: occupation ?? this.occupation,
       category: category ?? this.category,
@@ -132,6 +138,7 @@ class UserProfile extends Equatable {
         gender,
         email,
         phone,
+        photoUrl,
         income,
         occupation,
         category,
