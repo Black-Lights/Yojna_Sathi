@@ -1,6 +1,6 @@
 class AppConstants {
   // App Info
-  static const String appName = 'SchemaMitra';
+  static const String appName = 'Yojna Sathi';
   static const String appTagline = 'Aapka Haq, Aapke Haath Mein';
   
   // Firebase Collections

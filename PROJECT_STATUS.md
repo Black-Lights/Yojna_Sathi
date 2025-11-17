@@ -10,7 +10,7 @@
 
 ## 📋 Project Overview
 
-**Project Name:** Yojna Sathi (SchemaMitra)  
+**Project Name:** Yojna Sathi  
 **Description:** Government Scheme Eligibility & Application Mobile App  
 **Platform:** Flutter (Android & iOS)  
 **Current Version:** 1.0.0  

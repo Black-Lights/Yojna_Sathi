@@ -51,7 +51,7 @@ class _SplashPageState extends State<SplashPage> {
             ),
             const SizedBox(height: 24),
             Text(
-              'SchemaMitra',
+              'Yojna Sathi',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ class _SplashPageState extends State<SplashPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Aapka Haq, Aapke Haath Mein',
+              'Aapka Adhikaar, Aap Tak',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white70,
                   ),

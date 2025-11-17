@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SchemaMitra'),
+        title: const Text('Yojna Sathi'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome to SchemaMitra',
+                    'Welcome to Yojna Sathi',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),

@@ -1,8 +1,8 @@
-# SchemaMitra - Government Scheme Eligibility & Application Flutter App
+# Yojna Sathi - Government Scheme Eligibility & Application Flutter App
 
-![SchemaMitra Logo](assets/logos/logo.png)
+![Yojna Sathi Logo](assets/logos/logo.png)
 
-**Tagline:** Aapka Haq, Aapke Haath Mein
+**Tagline:** Aapka Adhikaar, Aap Tak
 
 A comprehensive Flutter mobile application that enables Indian citizens to discover, match, and apply for central and state government schemes. The app features personalized profile creation, automatic eligibility matching, direct application options, offline browsing, new scheme notifications, and tutorial guides.
 
@@ -307,4 +307,4 @@ For support, email support@schemamitra.com or join our Slack channel.
 
 ---
 
-**SchemaMitra** - Making government schemes accessible to every citizen
+**Yojna Sathi** - Making government schemes accessible to every citizen
