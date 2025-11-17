@@ -6,11 +6,6 @@
 
 A comprehensive Flutter mobile application that enables Indian citizens to discover, match, and apply for central and state government schemes. The app features personalized profile creation, automatic eligibility matching, direct application options, offline browsing, new scheme notifications, and tutorial guides.
 
-## 👨‍💻 Developers
-
-- **Ali Rehman** - [@Alirehman7062](https://github.com/Alirehman7062)
-- **Black Lights** - [@Black-Lights](https://github.com/Black-Lights)
-
 ## 📱 Features
 
 - **User Authentication**: Email, Phone, and Google sign-in options
