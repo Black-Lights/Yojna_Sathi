@@ -170,14 +170,16 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildProfileTab() {
     final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName ?? user?.email ?? 'User';
+    final initial = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : 'U';
     
     return ListView(
       children: [
         UserAccountsDrawerHeader(
-          accountName: Text(user?.displayName ?? 'User'),
+          accountName: Text(user?.displayName ?? user?.email ?? 'User'),
           accountEmail: Text(user?.email ?? ''),
           currentAccountPicture: CircleAvatar(
-            child: Text(user?.displayName?.substring(0, 1).toUpperCase() ?? 'U'),
+            child: Text(initial),
           ),
         ),
         ListTile(

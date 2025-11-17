@@ -6,6 +6,11 @@
 
 A comprehensive Flutter mobile application that enables Indian citizens to discover, match, and apply for central and state government schemes. The app features personalized profile creation, automatic eligibility matching, direct application options, offline browsing, new scheme notifications, and tutorial guides.
 
+## 👨‍💻 Developers
+
+- **Ali Rehman** - [@Alirehman7062](https://github.com/Alirehman7062)
+- **Black Lights** - [@Black-Lights](https://github.com/Black-Lights)
+
 ## 📱 Features
 
 - **User Authentication**: Email, Phone, and Google sign-in options
@@ -59,9 +64,10 @@ lib/
 
 ### Prerequisites
 
-- Flutter SDK (>=3.0.0)
-- Dart SDK (>=3.0.0)
-- Android Studio / VS Code
+- Flutter SDK (>=3.24.5)
+- Dart SDK (>=3.5.0)
+- Android Studio / VS Code with Android SDK
+- Node.js (for Firebase CLI)
 - Firebase account
 
 ### Installation
@@ -77,40 +83,44 @@ lib/
    flutter pub get
    ```
 
-3. **Firebase Setup**
+3. **Firebase Setup** ✅ (COMPLETED)
    
-   a. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   **Status:** Firebase is fully configured and integrated for this project.
    
-   b. Add Android and iOS apps to your Firebase project
+   ✅ **Completed Setup:**
+   - Project ID: `yojna-sathi`
+   - Authentication: Email/Password enabled and tested
+   - Firestore Database: Created and configured (asia-south2 - Delhi)
+   - Firebase packages: Updated to latest versions (firebase_auth 5.7.0+)
+   - Type casting errors: Fixed (updated from firebase_auth 4.x to 5.x)
+   - Android minSdk: Updated to 23 for compatibility
+   - User registration and login: Fully functional
    
-   c. Download configuration files:
-      - `google-services.json` for Android → Place in `android/app/`
-      - `GoogleService-Info.plist` for iOS → Place in `ios/Runner/`
+   For detailed Firebase setup instructions, see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
    
-   d. Update `lib/firebase_options.dart` with your Firebase configuration
+   If setting up a new Firebase project:
+   ```bash
+   # Install Firebase CLI
+   npm install -g firebase-tools
    
-   e. Enable Authentication methods:
-      - Email/Password
-      - Phone
-      - Google Sign-In
+   # Login to Firebase
+   firebase login
    
-   f. Create Firestore database with the following collections:
-      - users
-      - schemes
-      - user_schemes
-      - tutorials
-      - scheme_launches
-   
-   g. Deploy Firestore and Storage rules:
-      ```bash
-      firebase deploy --only firestore:rules
-      firebase deploy --only storage:rules
-      ```
+   # Configure FlutterFire
+   flutterfire configure --project=your-project-id
+   ```
 
 4. **Run the app**
    ```bash
+   # Clean build (recommended after pulling latest changes)
+   flutter clean
+   flutter pub get
+   
+   # Run the app
    flutter run
    ```
+   
+   **Note:** Android minSdkVersion is set to 23 (Android 6.0) due to Firebase Auth requirements.
 
 ## 🔧 Configuration
 
@@ -241,8 +251,9 @@ This project is licensed under the MIT License.
 
 ## 👥 Team
 
-- Project Lead: [Your Name]
-- Developers: [Team Members]
+**Developer:** Ali Rehman  
+**GitHub:** [@Black-Lights](https://github.com/Black-Lights) | [@Alirehman7062](https://github.com/Alirehman7062)  
+**Repository:** [Yojna_Sathi](https://github.com/Black-Lights/Yojna_Sathi)
 
 ## 📞 Support
 
@@ -259,7 +270,38 @@ For support, email support@schemamitra.com or join our Slack channel.
 
 ## 📸 Screenshots
 
-(Add screenshots of your app here)
+> **Note:** The following screenshots are for demonstration purposes only. The app is currently under development and features may change.
+
+<div align="center">
+
+### Splash Screen
+![Splash Screen](assets/images/Splash_Screen.jpeg)
+
+### Authentication
+<table>
+  <tr>
+    <td><img src="assets/images/Sign_In_Screen.jpeg" alt="Sign In" width="250"/></td>
+    <td><img src="assets/images/Register_Screen.jpeg" alt="Register" width="250"/></td>
+  </tr>
+</table>
+
+### Main Features
+<table>
+  <tr>
+    <td><img src="assets/images/Home_page.jpeg" alt="Home Page" width="250"/></td>
+    <td><img src="assets/images/Agriculture_Schemes_paage.jpeg" alt="Schemes" width="250"/></td>
+  </tr>
+</table>
+
+### User Profile & Settings
+<table>
+  <tr>
+    <td><img src="assets/images/Profile_page.jpeg" alt="Profile" width="250"/></td>
+    <td><img src="assets/images/Settings_page.jpeg" alt="Settings" width="250"/></td>
+  </tr>
+</table>
+
+</div>
 
 ## 🙏 Acknowledgments
 
