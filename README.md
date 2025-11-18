@@ -11,8 +11,8 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
 - **User Authentication**: Email, Phone, and Google sign-in options
 - **Profile Management**: Create and manage detailed user profiles with photo upload
 - **Scheme Discovery**: Browse 41+ government schemes across 9 categories
-- **Personalized Recommendations**: "For You" section with AI-powered matching
-- **Eligibility Matching**: Strict mandatory criteria checking including:
+- **Personalized Recommendations**: "For You" section with intelligent matching that auto-refreshes
+- **Eligibility Matching**: Strict mandatory criteria checking with real-time updates including:
   - Gender-based filtering (Male/Female/Transgender specific schemes)
   - Age range validation
   - Category matching (General, SC, ST, OBC, etc.)
@@ -29,7 +29,7 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
 ## 🏗️ Tech Stack
 
 - **Frontend**: Flutter (Dart)
-- **State Management**: BLoC Pattern
+- **State Management**: BLoC Pattern with persistent state management
 - **Backend**: Firebase
   - Authentication
   - Cloud Firestore

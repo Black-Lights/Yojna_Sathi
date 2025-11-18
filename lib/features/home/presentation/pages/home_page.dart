@@ -17,6 +17,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  SchemesBloc? _forYouBloc;
+
+  @override
+  void dispose() {
+    _forYouBloc?.close();
+    super.dispose();
+  }
+
+  void _refreshForYouSection() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      _forYouBloc?.add(LoadEligibleSchemesEvent(userId));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +69,10 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBody() {
     switch (_selectedIndex) {
       case 0:
+        // Refresh "For You" section when home tab is selected
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _refreshForYouSection();
+        });
         return _buildHomeTab();
       case 1:
         return _buildSchemesTab();
@@ -132,8 +150,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildForYouSection(String userId) {
-    return BlocProvider(
-      create: (context) => sl<SchemesBloc>()..add(LoadEligibleSchemesEvent(userId)),
+    // Create or reuse the BLoC instance
+    _forYouBloc ??= sl<SchemesBloc>()..add(LoadEligibleSchemesEvent(userId));
+    
+    return BlocProvider.value(
+      value: _forYouBloc!,
       child: BlocBuilder<SchemesBloc, SchemesState>(
         builder: (context, state) {
           if (state is SchemesLoading) {

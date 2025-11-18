@@ -4,7 +4,7 @@
 - Ali Rehman - [@Alirehman7062](https://github.com/Alirehman7062)
 - Black Lights - [@Black-Lights](https://github.com/Black-Lights)
 
-**Last Updated:** November 18, 2025
+**Last Updated:** November 18, 2025 (Evening Update) (Evening Update)
 
 ---
 
@@ -136,6 +136,10 @@ All screenshots are located in `assets/images/` directory.
 - ✅ Fixed navigation after successful login
 - ✅ Fixed null safety issues in profile display
 - ✅ Fixed compileSdk version warning (updated to SDK 35)
+- ✅ Fixed "For You" section not refreshing after navigation (Nov 18 Evening)
+- ✅ Implemented BLoC state persistence for consistent scheme display
+- ✅ Fixed "For You" section not refreshing on home page navigation
+- ✅ Implemented BLoC state persistence for consistent eligible schemes display
 
 ### 5. Branding & UI Updates
 - ✅ App rebranded from SchemaMitra to Yojna Sathi
@@ -183,7 +187,9 @@ All screenshots are located in `assets/images/` directory.
   - ✅ Development-friendly rules with TODO for production restrictions
 - ✅ **Testing & Verification**
   - ✅ Successfully tested scheme seeding (41 schemes uploaded)
-  - 🔄 Testing eligibility matching with real user profiles
+  - ✅ Testing eligibility matching with real user profiles
+  - ✅ Verified gender-based filtering (male users don't see female schemes)
+  - ✅ Verified home page refresh mechanism working correctly
 
 ---
 
