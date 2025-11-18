@@ -1356,6 +1356,12 @@ class SchemeDataset {
             ? [(eligibilityData['education'] as String)]
             : <String>[];
         
+        // Parse gender
+        final genderStr = eligibilityData['gender'] as String? ?? 'All';
+        final genders = genderStr == 'All' 
+            ? ['All']
+            : [genderStr]; // Keep the full string like "Female (pregnant women)"
+        
         return Scheme(
           schemeId: data['name']
               .toString()
@@ -1374,6 +1380,7 @@ class SchemeDataset {
             occupations: occupations,
             states: states,
             education: education,
+            genders: genders,
           ),
           benefits: Benefits(
             amount: _parseAmount(benefitsData['financial'] as String),

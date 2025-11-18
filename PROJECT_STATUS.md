@@ -154,19 +154,36 @@ All screenshots are located in `assets/images/` directory.
 
 ## 🔄 In Progress
 
-### Current Sprint: Government API Integration
-- 🔄 **MyScheme.gov.in API Integration**
-  - ✅ API research completed (4,420+ schemes identified)
-  - ✅ MySchemeApiService framework created
-  - ✅ Integration documentation written (SCHEME_API_INTEGRATION.md)
-  - 🔄 Awaiting API credentials from data.gov.in
-  - 🔄 Eligibility-based scheme matching implementation
-- 🔄 **Data Strategy: Hybrid Approach**
-  - ✅ Local Firestore with seed data (10 schemes) - Working
-  - 🔄 MyScheme API for real-time data (4,420+ schemes) - Pending credentials
-  - 🔄 Auto-sync mechanism (daily updates)
-- 🔄 Awaiting Firebase Blaze plan upgrade for Storage deployment
-- 🔄 Testing profile features (will work fully after Storage enabled)
+### Current Sprint: Eligibility-Based Scheme Discovery ✅
+- ✅ **Comprehensive Schemes Dataset**
+  - ✅ Created dataset with 41+ government schemes across 9 categories
+  - ✅ Successfully seeded all schemes to Firestore
+  - ✅ Schemes include: Agriculture, Education, Health, Housing, Women & Child, Business, Employment, Banking, Social Welfare
+- ✅ **Robust Eligibility Matching System**
+  - ✅ Enhanced EligibilityService with strict mandatory criteria checking
+  - ✅ Gender-based filtering (Male, Female, Transgender specific schemes)
+  - ✅ Age range validation (min/max age enforcement)
+  - ✅ Category matching (General, SC, ST, OBC, etc.)
+  - ✅ Occupation-based eligibility
+  - ✅ State/region-based filtering
+  - ✅ Education level requirements
+  - ✅ Income-based eligibility
+  - ✅ Eligibility scoring system (0.0-1.0 match score)
+- ✅ **Personalized Recommendations UI**
+  - ✅ "For You" section on home page showing top 3 eligible schemes
+  - ✅ Eligibility badges with color-coded indicators:
+    * Highly Eligible (90%+ match) - Green with verified icon
+    * Eligible (70-89% match) - Light green with check icon
+    * Partially Eligible (50-69% match) - Orange with info icon
+  - ✅ Match percentage display on recommended schemes
+  - ✅ Dedicated "For You" page for all eligible schemes
+  - ✅ Profile completion prompts when no data found
+- ✅ **Firestore Security Rules**
+  - ✅ Deployed updated rules allowing authenticated scheme writes
+  - ✅ Development-friendly rules with TODO for production restrictions
+- ✅ **Testing & Verification**
+  - ✅ Successfully tested scheme seeding (41 schemes uploaded)
+  - 🔄 Testing eligibility matching with real user profiles
 
 ---
 
@@ -200,13 +217,16 @@ All screenshots are located in `assets/images/` directory.
    - [x] Schemes BLoC implementation
    - [x] SchemeListPage with search and filtering
    - [x] SchemeDetailPage with comprehensive UI
-   - [x] Basic Firestore integration (10 seed schemes)
+   - [x] Comprehensive Firestore integration (41+ schemes)
    - [x] Research government APIs (MyScheme.gov.in)
    - [x] Create API service framework (MySchemeApiService)
+   - [x] Implement strict eligibility matching algorithm
+   - [x] Add scheme filtering by user profile with scoring
+   - [x] Personalized "For You" recommendations
+   - [x] Gender-based scheme filtering
+   - [x] Eligibility badges and visual indicators
    - [ ] Register for MyScheme API credentials at data.gov.in
    - [ ] Complete MyScheme API integration (4,420+ schemes)
-   - [ ] Implement eligibility matching algorithm (API-based)
-   - [ ] Add scheme filtering by user profile
    - [ ] Implement real-time scheme updates (daily sync)
    - [ ] Add scheme bookmarking/favorites
    - [ ] Implement scheme search with pagination
@@ -445,6 +465,22 @@ All screenshots are located in `assets/images/` directory.
 
 ## 🔄 Recent Updates
 
+### November 18, 2025 - Eligibility-Based Discovery System
+- ✅ **Comprehensive Scheme Database**: Seeded 41+ government schemes across 9 categories to Firestore
+- ✅ **Enhanced Eligibility Matching**: Implemented strict mandatory criteria checking including:
+  - Gender-based filtering (prevents showing female-only schemes to male users)
+  - Age range validation (min/max age requirements)
+  - Category, occupation, state, education matching
+  - Eligibility scoring system (0.0-1.0)
+- ✅ **Personalized UI**: 
+  - "For You" section on home page with top 3 recommendations
+  - Eligibility badges (Highly Eligible, Eligible, Partially Eligible)
+  - Match percentage display
+  - Dedicated "For You" page
+- ✅ **Fixed Critical Bug**: Female-specific schemes no longer shown to male users
+- ✅ **Firestore Rules**: Updated security rules to allow authenticated scheme writes
+- ✅ **Added Gender Field**: Extended Eligibility model to include gender array with complex parsing (e.g., "Female (pregnant women)")
+
 ### November 17, 2025
 - ✅ Fixed Firebase Auth Pigeon protocol type casting error
 - ✅ Updated Firebase packages to latest versions (firebase_auth 5.7.0)
@@ -456,4 +492,4 @@ All screenshots are located in `assets/images/` directory.
 
 ---
 
-*Last Updated: November 17, 2025*
+*Last Updated: November 18, 2025*

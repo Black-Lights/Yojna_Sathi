@@ -25,39 +25,81 @@ class EligibilityService {
     final unmatched = <String>[];
     double score = 0.0;
     int totalCriteria = 0;
+    int mandatoryCriteria = 0;
+    int mandatoryMatched = 0;
 
-    // Check Age
-    if (scheme.eligibility.minAge != null || scheme.eligibility.maxAge != null) {
+    // MANDATORY: Check Gender (must match if specified)
+    if (scheme.eligibility.genders.isNotEmpty &&
+        !scheme.eligibility.genders.contains('All')) {
+      mandatoryCriteria++;
       totalCriteria++;
-      if (_checkAge(user.age, scheme.eligibility.minAge, scheme.eligibility.maxAge)) {
-        matched.add('Age requirement met');
+      
+      // Extract base gender from complex strings like "Female (pregnant women)"
+      bool genderMatches = false;
+      for (final eligibleGender in scheme.eligibility.genders) {
+        final baseGender = _extractBaseGender(eligibleGender);
+        if (baseGender == user.gender || baseGender == 'All') {
+          genderMatches = true;
+          break;
+        }
+      }
+      
+      if (genderMatches) {
+        matched.add('Gender: ${user.gender}');
         score += 1.0;
+        mandatoryMatched++;
       } else {
-        unmatched.add('Age requirement not met');
+        unmatched.add('Gender: Scheme is for ${scheme.eligibility.genders.join(", ")}');
+        // Return immediately for gender mismatch - this is mandatory
+        return EligibilityResult(
+          isEligible: false,
+          matchScore: 0.0,
+          status: 'not_eligible',
+          reason: 'This scheme is exclusively for ${scheme.eligibility.genders.join(", ")}',
+          matchedCriteria: [],
+          unmatchedCriteria: ['Gender requirement not met'],
+        );
       }
     }
 
-    // Check Category
+    // MANDATORY: Check Age
+    if (scheme.eligibility.minAge != null || scheme.eligibility.maxAge != null) {
+      mandatoryCriteria++;
+      totalCriteria++;
+      if (_checkAge(user.age, scheme.eligibility.minAge, scheme.eligibility.maxAge)) {
+        matched.add('Age: ${user.age} years');
+        score += 1.0;
+        mandatoryMatched++;
+      } else {
+        unmatched.add('Age: Must be between ${scheme.eligibility.minAge ?? 0}-${scheme.eligibility.maxAge ?? "any"} years');
+      }
+    }
+
+    // MANDATORY: Check Category (if not "All")
     if (scheme.eligibility.categories.isNotEmpty &&
         !scheme.eligibility.categories.contains('All')) {
+      mandatoryCriteria++;
       totalCriteria++;
       if (scheme.eligibility.categories.contains(user.category)) {
         matched.add('Category: ${user.category}');
         score += 1.0;
+        mandatoryMatched++;
       } else {
-        unmatched.add('Category: ${user.category} not eligible');
+        unmatched.add('Category: Scheme is for ${scheme.eligibility.categories.join(", ")}');
       }
     }
 
-    // Check Occupation
+    // MANDATORY: Check Occupation (if not "All")
     if (scheme.eligibility.occupations.isNotEmpty &&
         !scheme.eligibility.occupations.contains('All')) {
+      mandatoryCriteria++;
       totalCriteria++;
       if (scheme.eligibility.occupations.contains(user.occupation)) {
         matched.add('Occupation: ${user.occupation}');
         score += 1.0;
+        mandatoryMatched++;
       } else {
-        unmatched.add('Occupation: ${user.occupation} not eligible');
+        unmatched.add('Occupation: Scheme is for ${scheme.eligibility.occupations.join(", ")}');
       }
     }
 
@@ -99,22 +141,30 @@ class EligibilityService {
     // Calculate final score
     final matchScore = totalCriteria > 0 ? score / totalCriteria : 0.0;
 
+    // STRICT: All mandatory criteria must be met
+    final mandatoryScore = mandatoryCriteria > 0 ? mandatoryMatched / mandatoryCriteria : 1.0;
+    
     // Determine eligibility status
     String status;
     String reason;
     bool isEligible;
 
-    if (matchScore >= 1.0) {
+    // Must meet ALL mandatory criteria (age, gender, category, occupation if specified)
+    if (mandatoryScore < 1.0) {
+      status = 'not_eligible';
+      reason = 'Does not meet mandatory requirements: ${unmatched.take(3).join(", ")}';
+      isEligible = false;
+    } else if (matchScore >= 1.0) {
       status = 'eligible';
       reason = 'You meet all the eligibility criteria for this scheme';
       isEligible = true;
     } else if (matchScore >= 0.7) {
       status = 'may_be_eligible';
-      reason = 'You meet most criteria. Manual verification may be required';
+      reason = 'You meet core requirements. Some optional criteria pending';
       isEligible = true;
     } else if (matchScore >= 0.5) {
-      status = 'may_be_eligible';
-      reason = 'You meet some criteria. Please check with authorities';
+      status = 'partially_eligible';
+      reason = 'You meet some criteria. Please verify with authorities';
       isEligible = false;
     } else {
       status = 'not_eligible';
@@ -136,6 +186,19 @@ class EligibilityService {
     if (minAge != null && userAge < minAge) return false;
     if (maxAge != null && userAge > maxAge) return false;
     return true;
+  }
+
+  String _extractBaseGender(String genderString) {
+    // Extract base gender from strings like "Female (pregnant women)"
+    final lower = genderString.toLowerCase();
+    if (lower.contains('female') || lower.contains('women') || lower.contains('girl')) {
+      return 'Female';
+    } else if (lower.contains('male') || lower.contains('men') || lower.contains('boy')) {
+      return 'Male';
+    } else if (lower.contains('transgender')) {
+      return 'Transgender';
+    }
+    return genderString; // Return as-is if can't parse
   }
 
   bool _checkIncome(String userIncome, String maxIncome) {

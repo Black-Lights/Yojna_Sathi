@@ -10,14 +10,21 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
 
 - **User Authentication**: Email, Phone, and Google sign-in options
 - **Profile Management**: Create and manage detailed user profiles with photo upload
-- **Scheme Discovery**: Browse and search thousands of government schemes
-- **Eligibility Matching**: Automatic matching based on user profile
+- **Scheme Discovery**: Browse 41+ government schemes across 9 categories
+- **Personalized Recommendations**: "For You" section with AI-powered matching
+- **Eligibility Matching**: Strict mandatory criteria checking including:
+  - Gender-based filtering (Male/Female/Transgender specific schemes)
+  - Age range validation
+  - Category matching (General, SC, ST, OBC, etc.)
+  - Occupation, State, Education, Income requirements
+  - Match score calculation (0-100%)
+- **Eligibility Badges**: Visual indicators (Highly Eligible 90%+, Eligible 70%+)
 - **Application Tracking**: Apply for schemes and track application status
 - **Document Upload**: Upload required documents for applications
 - **Tutorial Videos**: Step-by-step guides for scheme applications
-- **Offline Support**: Access schemes and tutorials offline
+- **Search & Filter**: Advanced search with category and eligibility filters
 - **Notifications**: Get notified about new schemes
-- **Multi-language**: Support for Hindi and English
+- **Multi-language**: Support for Hindi and English (in development)
 
 ## 🏗️ Tech Stack
 
@@ -272,17 +279,25 @@ For support, email support@schemamitra.com or join our Slack channel.
 - [x] Profile creation and editing with all fields
 - [x] Image compression and caching
 - [x] Android SDK 35 compatibility
+- [x] **41+ Government Schemes Database** across 9 categories
+- [x] **Strict Eligibility Matching System** with mandatory criteria
+- [x] **Gender-Based Filtering** (prevents showing female-only schemes to males)
+- [x] **Personalized "For You" Recommendations** with match scores
+- [x] **Eligibility Badges** with color-coded visual indicators
+- [x] **Firestore Integration** with real-time data sync
+- [x] **Enhanced EligibilityService** with scoring algorithm
 
 ### Upcoming Features
 - [ ] Profile completion progress indicator
-- [ ] Firestore collections structure for schemes
-- [ ] Scheme eligibility matching algorithm
+- [ ] Scheme bookmarking/favorites
 - [ ] Phone and Google authentication
 - [ ] Integrate Aadhaar eKYC API
-- [ ] Add more regional languages
-- [ ] Implement AI-based scheme recommendations
-- [ ] GIS/map integration for location-based benefits
-- [ ] Offline CSC verification
+- [ ] Add more regional languages (Hindi, Tamil, Telugu, Bengali)
+- [ ] Implement offline caching with Hive
+- [ ] Application submission and tracking
+- [ ] Document upload for scheme applications
+- [ ] Push notifications for new eligible schemes
+- [ ] Tutorial video integration
 - [ ] Admin panel for scheme management
 
 ## 📸 Screenshots

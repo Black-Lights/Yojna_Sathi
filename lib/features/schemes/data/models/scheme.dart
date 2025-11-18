@@ -53,6 +53,7 @@ class Scheme extends Equatable {
         occupations: List<String>.from(eligibilityData['occupations'] ?? []),
         states: List<String>.from(eligibilityData['states'] ?? []),
         education: List<String>.from(eligibilityData['education'] ?? []),
+        genders: List<String>.from(eligibilityData['genders'] ?? ['All']),
       ),
       benefits: Benefits(
         amount: (benefitsData['amount'] as num?)?.toDouble(),
@@ -89,6 +90,7 @@ class Scheme extends Equatable {
         'occupations': eligibility.occupations,
         'states': eligibility.states,
         'education': eligibility.education,
+        'genders': eligibility.genders,
       },
       'benefits': {
         'amount': benefits.amount,
@@ -133,6 +135,7 @@ class Eligibility extends Equatable {
   final List<String> occupations;
   final List<String> states;
   final List<String> education;
+  final List<String> genders; // Gender eligibility: Male, Female, Transgender, All
 
   const Eligibility({
     this.minAge,
@@ -142,6 +145,7 @@ class Eligibility extends Equatable {
     required this.occupations,
     required this.states,
     required this.education,
+    this.genders = const ['All'],
   });
 
   @override
@@ -153,6 +157,7 @@ class Eligibility extends Equatable {
         occupations,
         states,
         education,
+        genders,
       ];
 }
 
