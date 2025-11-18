@@ -154,9 +154,18 @@ All screenshots are located in `assets/images/` directory.
 
 ## 🔄 In Progress
 
-### Current Sprint
+### Current Sprint: Government API Integration
+- 🔄 **MyScheme.gov.in API Integration**
+  - ✅ API research completed (4,420+ schemes identified)
+  - ✅ MySchemeApiService framework created
+  - ✅ Integration documentation written (SCHEME_API_INTEGRATION.md)
+  - 🔄 Awaiting API credentials from data.gov.in
+  - 🔄 Eligibility-based scheme matching implementation
+- 🔄 **Data Strategy: Hybrid Approach**
+  - ✅ Local Firestore with seed data (10 schemes) - Working
+  - 🔄 MyScheme API for real-time data (4,420+ schemes) - Pending credentials
+  - 🔄 Auto-sync mechanism (daily updates)
 - 🔄 Awaiting Firebase Blaze plan upgrade for Storage deployment
-- 🔄 Ready to seed schemes data once Storage is active
 - 🔄 Testing profile features (will work fully after Storage enabled)
 
 ---
@@ -188,12 +197,20 @@ All screenshots are located in `assets/images/` directory.
    - [ ] Add profile completion progress indicator
 
 3. **Schemes Module Enhancement**
-   - [ ] Fetch schemes from Firestore
-   - [ ] Implement real-time scheme updates
+   - [x] Schemes BLoC implementation
+   - [x] SchemeListPage with search and filtering
+   - [x] SchemeDetailPage with comprehensive UI
+   - [x] Basic Firestore integration (10 seed schemes)
+   - [x] Research government APIs (MyScheme.gov.in)
+   - [x] Create API service framework (MySchemeApiService)
+   - [ ] Register for MyScheme API credentials at data.gov.in
+   - [ ] Complete MyScheme API integration (4,420+ schemes)
+   - [ ] Implement eligibility matching algorithm (API-based)
+   - [ ] Add scheme filtering by user profile
+   - [ ] Implement real-time scheme updates (daily sync)
    - [ ] Add scheme bookmarking/favorites
-   - [ ] Implement eligibility matching algorithm
-   - [ ] Add scheme filtering by eligibility
    - [ ] Implement scheme search with pagination
+   - [ ] Cache API responses in Firestore (offline support)
 
 4. **Application Module**
    - [ ] Connect application submission to Firestore
@@ -333,7 +350,16 @@ All screenshots are located in `assets/images/` directory.
 ## 🐛 Known Issues
 
 ### Critical
-- None currently
+- **Firebase Storage Access Blocked**: Requires Blaze plan upgrade
+  - Impact: Profile photo upload, document uploads disabled
+  - Workaround: Using default avatars until upgrade
+  - Status: Pending billing setup
+
+- **MyScheme API Access Pending**: API credentials required
+  - Impact: Using limited seed data (10 schemes) instead of 4,420+ schemes
+  - Workaround: Local Firestore with manually curated schemes
+  - Action Required: Register at data.gov.in and contact MyScheme support
+  - See: SCHEME_API_INTEGRATION.md for details
 
 ### Minor
 - Google Play Services warnings in emulator (expected in emulator environment)
