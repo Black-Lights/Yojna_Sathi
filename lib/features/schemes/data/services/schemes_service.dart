@@ -138,4 +138,36 @@ class SchemesService {
       throw Exception('Failed to get recent schemes: $e');
     }
   }
+
+  /// Get all active schemes (not expired)
+  Future<List<Scheme>> getActiveSchemes() async {
+    try {
+      final snapshot = await _firestore
+          .collection(AppConstants.schemesCollection)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      return snapshot.docs.map((doc) => Scheme.fromFirestore(doc)).toList();
+    } catch (e) {
+      throw Exception('Failed to get active schemes: $e');
+    }
+  }
+
+  /// Bulk add multiple schemes (for seeding)
+  Future<void> addMultipleSchemes(List<Scheme> schemes) async {
+    try {
+      final batch = _firestore.batch();
+
+      for (final scheme in schemes) {
+        final docRef = _firestore
+            .collection(AppConstants.schemesCollection)
+            .doc(scheme.schemeId);
+        batch.set(docRef, scheme.toFirestore());
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to add multiple schemes: $e');
+    }
+  }
 }
