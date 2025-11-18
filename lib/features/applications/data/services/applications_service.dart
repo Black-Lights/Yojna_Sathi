@@ -12,14 +12,22 @@ class ApplicationsService {
 
   Future<List<UserScheme>> getUserApplications(String userId) async {
     try {
+      // Query without orderBy to avoid index requirement
       final snapshot = await _firestore
           .collection(AppConstants.userSchemesCollection)
           .where('userId', isEqualTo: userId)
-          .orderBy('lastUpdated', descending: true)
           .get();
 
-      return snapshot.docs.map((doc) => UserScheme.fromFirestore(doc)).toList();
+      // Sort in memory instead
+      final applications = snapshot.docs.map((doc) => UserScheme.fromFirestore(doc)).toList();
+      applications.sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+      
+      return applications;
     } catch (e) {
+      // Return empty list instead of throwing exception if no data
+      if (e.toString().contains('no documents')) {
+        return [];
+      }
       throw Exception('Failed to get user applications: $e');
     }
   }
@@ -171,24 +179,15 @@ class ApplicationsService {
     required File file,
   }) async {
     try {
-      final fileName = '${documentType}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(file.path)}';
-      final storagePath = 'applications/$userId/$schemeId/$fileName';
-      
-      await _storageService.uploadFile(
+      return await _storageService.uploadDocument(
+        userId: userId,
+        schemeId: schemeId,
         file: file,
-        path: storagePath,
+        documentType: documentType,
       );
-      
-      return storagePath;
     } catch (e) {
       throw Exception('Failed to upload document: $e');
     }
-  }
-
-  String _getFileExtension(String path) {
-    final lastDot = path.lastIndexOf('.');
-    if (lastDot == -1) return '';
-    return path.substring(lastDot);
   }
 
   Future<String> getDocumentUrl(String storagePath) async {
