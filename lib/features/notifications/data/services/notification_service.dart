@@ -294,7 +294,6 @@ class NotificationService {
     return _firestore
         .collection('notifications')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .limit(50)
         .snapshots();
   }
