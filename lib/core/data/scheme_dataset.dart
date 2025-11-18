@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:yojna_sathi/features/schemes/data/models/scheme.dart';
-import 'package:yojna_sathi/features/schemes/data/services/schemes_service.dart';
+import 'package:schema_mitra/features/schemes/data/models/scheme.dart';
+import 'package:schema_mitra/features/schemes/data/services/schemes_service.dart';
 
 /// Comprehensive dataset of 100+ Indian Government Schemes
 /// Data sourced from official government websites (Nov 2025)
@@ -1313,6 +1313,49 @@ class SchemeDataset {
     try {
       final allSchemesData = getAllSchemes();
       final schemes = allSchemesData.map((data) {
+        final eligibilityData = data['eligibility'] as Map<String, dynamic>;
+        final benefitsData = data['benefits'] as Map<String, dynamic>;
+        
+        // Parse eligibility criteria
+        final states = data['state'] == 'All India' 
+            ? ['All States'] 
+            : [data['state'] as String];
+        
+        // Parse age from string
+        int? minAge;
+        int? maxAge;
+        final ageStr = eligibilityData['age'] as String;
+        if (ageStr.contains('Below') || ageStr.contains('<')) {
+          maxAge = int.tryParse(ageStr.replaceAll(RegExp(r'[^0-9]'), ''));
+        } else if (ageStr.contains('Above') || ageStr.contains('>')) {
+          minAge = int.tryParse(ageStr.replaceAll(RegExp(r'[^0-9]'), ''));
+        } else if (ageStr.contains('-') || ageStr.contains('to')) {
+          final parts = ageStr.split(RegExp(r'[-to]'));
+          if (parts.length == 2) {
+            minAge = int.tryParse(parts[0].trim());
+            maxAge = int.tryParse(parts[1].trim());
+          }
+        }
+        
+        // Parse occupation
+        final occupations = (eligibilityData['occupation'] as String)
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        
+        // Parse categories
+        final categories = (eligibilityData['category'] as String)
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        
+        // Parse education
+        final education = eligibilityData.containsKey('education')
+            ? [(eligibilityData['education'] as String)]
+            : <String>[];
+        
         return Scheme(
           schemeId: data['name']
               .toString()
@@ -1323,15 +1366,28 @@ class SchemeDataset {
           description: data['description'] as String,
           ministry: data['ministry'] as String,
           category: data['category'] as String,
-          benefits: Map<String, String>.from(data['benefits'] as Map),
-          eligibility: Map<String, String>.from(data['eligibility'] as Map),
-          state: data['state'] as String,
-          applicationUrl: data['applicationUrl'] as String,
-          documentsRequired: List<String>.from(data['documentsRequired'] as List),
+          eligibility: Eligibility(
+            minAge: minAge,
+            maxAge: maxAge,
+            incomeMax: eligibilityData['income'] as String?,
+            categories: categories,
+            occupations: occupations,
+            states: states,
+            education: education,
+          ),
+          benefits: Benefits(
+            amount: _parseAmount(benefitsData['financial'] as String),
+            type: 'Financial Assistance',
+            frequency: 'As per scheme guidelines',
+            description: '${benefitsData['financial']}\n${benefitsData['nonFinancial']}',
+          ),
           applicationProcess: data['applicationProcess'] as String,
-          importantDates: data['importantDates'] as String,
-          isActive: data['isActive'] as bool,
-          launchDate: DateTime.now().subtract(const Duration(days: 365)), // Default
+          documentsRequired: List<String>.from(data['documentsRequired'] as List),
+          officialLink: data['applicationUrl'] as String,
+          launchDate: DateTime.now().subtract(const Duration(days: 365)),
+          deadline: null,
+          source: 'Government of India',
+          videoTutorialId: null,
         );
       }).toList();
 
@@ -1342,5 +1398,23 @@ class SchemeDataset {
       print('Error seeding schemes: $e');
       rethrow;
     }
+  }
+  
+  /// Helper to parse amount from text
+  static double? _parseAmount(String text) {
+    final match = RegExp(r'₹\s*([0-9,.]+)\s*(lakh|crore|thousand|L|K)?', caseSensitive: false)
+        .firstMatch(text);
+    if (match != null) {
+      final value = double.tryParse(match.group(1)!.replaceAll(',', '')) ?? 0;
+      final unit = match.group(2)?.toLowerCase();
+      
+      if (unit != null) {
+        if (unit.contains('crore')) return value * 10000000;
+        if (unit.contains('lakh') || unit == 'l') return value * 100000;
+        if (unit.contains('thousand') || unit == 'k') return value * 1000;
+      }
+      return value;
+    }
+    return null;
   }
 }
