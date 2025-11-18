@@ -13,6 +13,7 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
 import 'features/schemes/presentation/bloc/schemes_bloc.dart';
 import 'features/applications/presentation/bloc/applications_bloc.dart';
+import 'features/notifications/data/services/notification_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -28,6 +29,10 @@ void main() async {
   
   // Initialize dependency injection
   await initializeDependencies();
+  
+  // Initialize notifications
+  final notificationService = sl<NotificationService>();
+  await notificationService.initialize();
   
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
