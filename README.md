@@ -1,8 +1,11 @@
 # Yojna Sathi - Government Scheme Eligibility & Application Flutter App
 
-![Yojna Sathi Logo](assets/logos/logo.png)
+<p align="center">
+  <img src="android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Yojna Sathi Logo" width="150"/>
+</p>
 
-**Tagline:** Aapka Adhikaar, Aap Tak
+<h3 align="center">आपका अधिकार, आप तक</h3>
+<h4 align="center">Your Rights, To You</h4>
 
 A comprehensive Flutter mobile application that enables Indian citizens to discover, match, and apply for central and state government schemes. The app features personalized profile creation, automatic eligibility matching, direct application options, offline browsing, new scheme notifications, and tutorial guides.
 
@@ -24,11 +27,18 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
   - Duplicate application prevention
   - Application status tracking (Pending, Under Review, Approved, Rejected)
 - **Application History**: View all submitted applications with status badges
+- **Push Notifications**: Real-time notifications for new schemes and application updates
+  - Firebase Cloud Messaging (FCM) integration
+  - Local notifications support
+  - Notification preferences management
+  - Topic-based subscriptions
+  - Notification history with mark as read
 - **Eligibility Badges**: Visual indicators (Highly Eligible 90%+, Eligible 70%+)
 - **Tutorial Videos**: Step-by-step guides for scheme applications
 - **Search & Filter**: Advanced search with category and eligibility filters
-- **Notifications**: Get notified about new schemes
+- **Notifications**: Real-time push notifications with preferences management
 - **Multi-language**: Support for Hindi and English (in development)
+- **Custom App Icon**: Professional Yojna Sathi branding
 
 ## 🏗️ Tech Stack
 
@@ -40,6 +50,8 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
   - Cloud Storage (for profile photos)
   - Cloud Messaging (FCM)
 - **Image Handling**: image_picker, cached_network_image
+- **Document Handling**: file_picker for document uploads
+- **Notifications**: firebase_messaging, flutter_local_notifications
 - **Local Storage**: Hive
 - **Architecture**: Clean Architecture with feature-based structure
 
