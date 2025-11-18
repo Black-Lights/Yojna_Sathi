@@ -4,7 +4,7 @@
 - Ali Rehman - [@Alirehman7062](https://github.com/Alirehman7062)
 - Black Lights - [@Black-Lights](https://github.com/Black-Lights)
 
-**Last Updated:** November 17, 2025
+**Last Updated:** November 18, 2025
 
 ---
 
@@ -54,11 +54,14 @@ All screenshots are located in `assets/images/` directory.
   - Auth service with Firebase integration
 
 - ✅ **Profile Management**
-  - Profile creation page
-  - Profile edit page
-  - User profile data models
+  - Profile creation page with photo upload
+  - Profile edit page with all fields
+  - Profile photo upload to Firebase Storage
+  - User profile data models with photoUrl support
   - Profile service with Firestore integration
   - BLoC for profile state management
+  - CachedNetworkImage for photo display
+  - Image compression (512x512, 75% quality)
 
 - ✅ **Home Dashboard**
   - Bottom navigation with 4 tabs
@@ -102,15 +105,21 @@ All screenshots are located in `assets/images/` directory.
   - User ID: kn5gVKqTDgXjxty4fYqEj0l0CN93
 - ✅ Cloud Firestore database created (asia-south2 - Delhi)
 - ✅ Firebase packages updated to latest versions
-  - firebase_core: ^3.15.2
+  - firebase_core: ^3.6.0
   - firebase_auth: ^5.7.0
   - cloud_firestore: ^5.6.12
   - firebase_storage: ^12.4.10
   - firebase_messaging: ^15.2.10
+- ✅ Additional packages added
+  - image_picker: ^1.1.2 (for profile photo selection)
+  - cached_network_image: ^3.4.1 (for image caching)
 - ✅ `google-services.json` configured for Android
 - ✅ `firebase_options.dart` generated with FlutterFire CLI
 - ✅ Firebase Auth type casting bug fixed (Pigeon protocol issue)
-- ✅ Android minSdkVersion updated to 23 for compatibility
+- ✅ Android build configuration updated
+  - minSdkVersion: 23
+  - compileSdk: 35
+  - targetSdk: 34
 
 ### 4. Bug Fixes & Optimizations
 - ✅ Fixed Firebase Auth Pigeon type casting error
@@ -119,8 +128,16 @@ All screenshots are located in `assets/images/` directory.
 - ✅ Resolved Gradle build issues
 - ✅ Fixed navigation after successful login
 - ✅ Fixed null safety issues in profile display
+- ✅ Fixed compileSdk version warning (updated to SDK 35)
 
-### 5. Documentation
+### 5. Branding & UI Updates
+- ✅ App rebranded from SchemaMitra to Yojna Sathi
+- ✅ New tagline: "Aapka Adhikaar, Aap Tak"
+- ✅ Updated splash screen with new branding
+- ✅ Updated home screen with new tagline
+- ✅ Updated README and documentation
+
+### 6. Documentation
 - ✅ README.md created with setup instructions
 - ✅ FIREBASE_SETUP.md created with detailed Firebase setup
 - ✅ PROJECT_STATUS.md (this file)
@@ -131,8 +148,8 @@ All screenshots are located in `assets/images/` directory.
 ## 🔄 In Progress
 
 ### Current Sprint
-- 🔄 Testing complete authentication flow
-- 🔄 Profile creation and editing functionality testing
+- 🔄 Testing profile photo upload functionality
+- 🔄 Testing profile edit page with all fields
 - 🔄 Firebase Firestore data structure finalization
 
 ---
@@ -152,10 +169,11 @@ All screenshots are located in `assets/images/` directory.
    - [ ] Seed initial scheme data
 
 2. **Profile Module Completion**
-   - [ ] Complete profile creation flow after signup
-   - [ ] Add profile photo upload to Firebase Storage
+   - [x] Complete profile creation flow after signup
+   - [x] Add profile photo upload to Firebase Storage
+   - [x] Implement profile edit page with all fields
    - [ ] Implement profile data validation
-   - [ ] Save profile data to Firestore
+   - [x] Save profile data to Firestore
    - [ ] Load profile data on app launch
    - [ ] Add profile completion progress indicator
 

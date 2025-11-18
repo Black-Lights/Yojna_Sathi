@@ -9,7 +9,7 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
 ## 📱 Features
 
 - **User Authentication**: Email, Phone, and Google sign-in options
-- **Profile Management**: Create and manage detailed user profiles
+- **Profile Management**: Create and manage detailed user profiles with photo upload
 - **Scheme Discovery**: Browse and search thousands of government schemes
 - **Eligibility Matching**: Automatic matching based on user profile
 - **Application Tracking**: Apply for schemes and track application status
@@ -26,8 +26,9 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
 - **Backend**: Firebase
   - Authentication
   - Cloud Firestore
-  - Cloud Storage
+  - Cloud Storage (for profile photos)
   - Cloud Messaging (FCM)
+- **Image Handling**: image_picker, cached_network_image
 - **Local Storage**: Hive
 - **Architecture**: Clean Architecture with feature-based structure
 
@@ -86,10 +87,19 @@ lib/
    - Project ID: `yojna-sathi`
    - Authentication: Email/Password enabled and tested
    - Firestore Database: Created and configured (asia-south2 - Delhi)
-   - Firebase packages: Updated to latest versions (firebase_auth 5.7.0+)
+   - Firebase Storage: Profile photos uploaded to `profile_photos/` bucket
+   - Firebase packages: Updated to latest versions
+     - firebase_core: ^3.6.0
+     - firebase_auth: ^5.7.0
+     - cloud_firestore: ^5.6.12
+     - firebase_storage: ^12.4.10
+   - Additional packages:
+     - image_picker: ^1.1.2
+     - cached_network_image: ^3.4.1
    - Type casting errors: Fixed (updated from firebase_auth 4.x to 5.x)
-   - Android minSdk: Updated to 23 for compatibility
+   - Android SDK: minSdk 23, compileSdk 35, targetSdk 34
    - User registration and login: Fully functional
+   - Profile creation and editing: Fully functional with photo upload
    
    For detailed Firebase setup instructions, see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
    
@@ -160,6 +170,7 @@ assets/
   "userId": "string",
   "profile": {
     "name": "string",
+    "photoUrl": "string",
     "age": "number",
     "gender": "string",
     "email": "string",
@@ -256,6 +267,17 @@ For support, email support@schemamitra.com or join our Slack channel.
 
 ## 🗺️ Roadmap
 
+### Recently Completed ✅
+- [x] Profile photo upload with Firebase Storage
+- [x] Profile creation and editing with all fields
+- [x] Image compression and caching
+- [x] Android SDK 35 compatibility
+
+### Upcoming Features
+- [ ] Profile completion progress indicator
+- [ ] Firestore collections structure for schemes
+- [ ] Scheme eligibility matching algorithm
+- [ ] Phone and Google authentication
 - [ ] Integrate Aadhaar eKYC API
 - [ ] Add more regional languages
 - [ ] Implement AI-based scheme recommendations
