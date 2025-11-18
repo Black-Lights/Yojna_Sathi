@@ -18,9 +18,13 @@ A comprehensive Flutter mobile application that enables Indian citizens to disco
   - Category matching (General, SC, ST, OBC, etc.)
   - Occupation, State, Education, Income requirements
   - Match score calculation (0-100%)
+- **Application Submission**: Complete application flow with document upload
+  - Multi-document upload (Aadhaar, PAN, Income Certificate, etc.)
+  - Progress tracking during submission
+  - Duplicate application prevention
+  - Application status tracking (Pending, Under Review, Approved, Rejected)
+- **Application History**: View all submitted applications with status badges
 - **Eligibility Badges**: Visual indicators (Highly Eligible 90%+, Eligible 70%+)
-- **Application Tracking**: Apply for schemes and track application status
-- **Document Upload**: Upload required documents for applications
 - **Tutorial Videos**: Step-by-step guides for scheme applications
 - **Search & Filter**: Advanced search with category and eligibility filters
 - **Notifications**: Get notified about new schemes

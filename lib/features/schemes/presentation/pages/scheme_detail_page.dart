@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../applications/presentation/pages/application_submission_page.dart';
+import '../../../applications/data/services/applications_service.dart';
 import '../bloc/schemes_bloc.dart';
 import '../../data/models/scheme.dart';
 
@@ -277,24 +280,7 @@ class _SchemeDetailView extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement apply functionality
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Application feature coming soon!'),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.send),
-                    label: const Text('Apply Now'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                ),
+                _ApplyButton(scheme: scheme),
                 const SizedBox(height: 32),
               ],
             ),
@@ -468,5 +454,181 @@ class _EligibilityItem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ApplyButton extends StatefulWidget {
+  final Scheme scheme;
+
+  const _ApplyButton({required this.scheme});
+
+  @override
+  State<_ApplyButton> createState() => _ApplyButtonState();
+}
+
+class _ApplyButtonState extends State<_ApplyButton> {
+  bool _isLoading = true;
+  bool _hasApplied = false;
+  String? _applicationStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkApplicationStatus();
+  }
+
+  Future<void> _checkApplicationStatus() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    try {
+      final applicationsService = sl<ApplicationsService>();
+      final existingApplication = await applicationsService.getUserScheme(
+        userId,
+        widget.scheme.schemeId,
+      );
+
+      if (mounted) {
+        setState(() {
+          _hasApplied = existingApplication != null;
+          _applicationStatus = existingApplication?.status;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _navigateToApplication() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please sign in to apply for this scheme'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ApplicationSubmissionPage(
+          scheme: widget.scheme,
+          userId: userId,
+        ),
+      ),
+    );
+
+    // Refresh status if application was submitted
+    if (result == true) {
+      _checkApplicationStatus();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_hasApplied) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _getStatusColor(_applicationStatus).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _getStatusColor(_applicationStatus),
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              _getStatusIcon(_applicationStatus),
+              color: _getStatusColor(_applicationStatus),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Application Status',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    _applicationStatus ?? 'Applied',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: _getStatusColor(_applicationStatus),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _navigateToApplication,
+        icon: const Icon(Icons.send),
+        label: const Text('Apply Now'),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(16),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return Colors.green;
+      case 'rejected':
+        return Colors.red;
+      case 'pending':
+      case 'under review':
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
+  }
+
+  IconData _getStatusIcon(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return Icons.check_circle;
+      case 'rejected':
+        return Icons.cancel;
+      case 'pending':
+      case 'under review':
+        return Icons.hourglass_empty;
+      default:
+        return Icons.info;
+    }
   }
 }

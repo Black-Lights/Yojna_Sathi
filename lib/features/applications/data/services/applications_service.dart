@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/services/storage_service.dart';
 import '../models/user_scheme.dart';
@@ -160,6 +161,41 @@ class ApplicationsService {
       return snapshot.docs.length;
     } catch (e) {
       throw Exception('Failed to get applications count: $e');
+    }
+  }
+
+  Future<String> uploadDocument({
+    required String userId,
+    required String schemeId,
+    required String documentType,
+    required File file,
+  }) async {
+    try {
+      final fileName = '${documentType}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(file.path)}';
+      final storagePath = 'applications/$userId/$schemeId/$fileName';
+      
+      await _storageService.uploadFile(
+        file: file,
+        path: storagePath,
+      );
+      
+      return storagePath;
+    } catch (e) {
+      throw Exception('Failed to upload document: $e');
+    }
+  }
+
+  String _getFileExtension(String path) {
+    final lastDot = path.lastIndexOf('.');
+    if (lastDot == -1) return '';
+    return path.substring(lastDot);
+  }
+
+  Future<String> getDocumentUrl(String storagePath) async {
+    try {
+      return await _storageService.getDownloadUrl(storagePath);
+    } catch (e) {
+      throw Exception('Failed to get document URL: $e');
     }
   }
 }
