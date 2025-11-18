@@ -30,10 +30,6 @@ void main() async {
   // Initialize dependency injection
   await initializeDependencies();
   
-  // Initialize notifications
-  final notificationService = sl<NotificationService>();
-  await notificationService.initialize();
-  
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -48,6 +44,16 @@ class SchemaMitraApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize notifications asynchronously after app starts
+    Future.microtask(() async {
+      try {
+        final notificationService = sl<NotificationService>();
+        await notificationService.initialize();
+      } catch (e) {
+        debugPrint('Failed to initialize notifications: $e');
+      }
+    });
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => sl<AuthBloc>()..add(CheckAuthStatusEvent())),

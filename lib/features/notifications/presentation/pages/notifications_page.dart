@@ -95,6 +95,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
           final notifications = snapshot.data!.docs
               .map((doc) => NotificationModel.fromFirestore(doc))
               .toList();
+          
+          // Sort by createdAt client-side
+          notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
           return RefreshIndicator(
             onRefresh: () async {

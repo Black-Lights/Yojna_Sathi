@@ -18,25 +18,26 @@ class NotificationService {
   NotificationService(this._messaging, this._firestore);
 
   Future<void> initialize() async {
-    // Request permission for iOS
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
+    try {
+      // Request permission for iOS
+      NotificationSettings settings = await _messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted notification permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-      print('User granted provisional notification permission');
-    } else {
-      print('User declined notification permission');
-      return;
-    }
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        print('User granted notification permission');
+      } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+        print('User granted provisional notification permission');
+      } else {
+        print('User declined notification permission');
+        return;
+      }
 
     // Initialize local notifications (for Android foreground)
     const AndroidInitializationSettings androidSettings =
@@ -89,6 +90,9 @@ class NotificationService {
     RemoteMessage? initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       _handleBackgroundMessageTap(initialMessage);
+    }
+    } catch (e) {
+      print('Error initializing notifications: $e');
     }
   }
 
@@ -294,28 +298,4 @@ class NotificationService {
         .limit(50)
         .snapshots();
   }
-}
-  Future<void> subscribeToTopic(String topic) async {
-    await _messaging.subscribeToTopic(topic);
-  }
-
-  Future<void> unsubscribeFromTopic(String topic) async {
-    await _messaging.unsubscribeFromTopic(topic);
-  }
-
-  Future<String?> getToken() async {
-    return await _messaging.getToken();
-  }
-
-  Future<void> saveTokenToFirestore(String userId, String token) async {
-    await _firestore.collection('users').doc(userId).update({
-      'fcmToken': token,
-      'tokenUpdatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-}
-
-// Top-level function for background message handling
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling background message: ${message.messageId}');
 }
