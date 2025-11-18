@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/data/scheme_dataset.dart';
 import '../../../schemes/data/services/schemes_service.dart';
+import 'notification_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -85,8 +86,16 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.notifications),
             title: const Text('Notifications'),
-            subtitle: const Text('Manage notification settings'),
-            onTap: () {},
+            subtitle: const Text('Manage notification preferences'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationSettingsPage(),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.info),
