@@ -120,6 +120,13 @@ All screenshots are located in `assets/images/` directory.
   - minSdkVersion: 23
   - compileSdk: 35
   - targetSdk: 34
+- ✅ Firestore collections structure created
+  - users, schemes, user_schemes, tutorials collections defined
+  - All data models and services implemented
+- ✅ Firestore security rules deployed
+- ✅ Firestore indexes deployed for query optimization
+- ✅ Seed data script created (10 government schemes)
+- ⚠️ Firebase Storage configured but not deployed (requires Blaze plan upgrade)
 
 ### 4. Bug Fixes & Optimizations
 - ✅ Fixed Firebase Auth Pigeon type casting error
@@ -148,9 +155,9 @@ All screenshots are located in `assets/images/` directory.
 ## 🔄 In Progress
 
 ### Current Sprint
-- 🔄 Testing profile photo upload functionality
-- 🔄 Testing profile edit page with all fields
-- 🔄 Firebase Firestore data structure finalization
+- 🔄 Awaiting Firebase Blaze plan upgrade for Storage deployment
+- 🔄 Ready to seed schemes data once Storage is active
+- 🔄 Testing profile features (will work fully after Storage enabled)
 
 ---
 
@@ -159,14 +166,17 @@ All screenshots are located in `assets/images/` directory.
 ### Phase 1: Core Functionality (MVP)
 
 #### High Priority
-1. **Firestore Database Setup**
-   - [ ] Create Firestore collections structure
-     - [ ] `users` collection with user profile schema
-     - [ ] `schemes` collection with scheme data
-     - [ ] `user_schemes` collection for applications
-     - [ ] `tutorials` collection for video tutorials
-   - [ ] Deploy Firestore security rules
-   - [ ] Seed initial scheme data
+1. **Firestore Database Setup** ✅
+   - [x] Create Firestore collections structure
+     - [x] `users` collection with user profile schema
+     - [x] `schemes` collection with scheme data
+     - [x] `user_schemes` collection for applications
+     - [x] `tutorials` collection for video tutorials
+   - [x] Deploy Firestore security rules
+   - [x] Firestore indexes deployed
+   - [x] Seed data script created (scripts/seed_schemes.dart)
+   - [ ] Execute seed data (pending: need to run seed script in app)
+   - [ ] Deploy Firebase Storage rules (BLOCKED: requires Blaze plan)
 
 2. **Profile Module Completion**
    - [x] Complete profile creation flow after signup
@@ -236,6 +246,32 @@ All screenshots are located in `assets/images/` directory.
     - [ ] Privacy policy
     - [ ] Terms of service
     - [ ] App version and updates
+
+---
+
+## ⚠️ Known Issues & Blockers
+
+### Critical Blockers
+1. **Firebase Storage Not Available - Requires Blaze Plan Upgrade**
+   - **Issue**: Firebase Storage (for profile photos and documents) requires Blaze (pay-as-you-go) plan
+   - **Current Plan**: Spark (free tier) - Storage not available
+   - **Impact**: 
+     - Profile photo upload feature implemented but cannot be tested
+     - Document upload for scheme applications blocked
+     - Storage security rules ready but cannot be deployed
+   - **Workaround**: None - must upgrade to Blaze plan
+   - **Action Required**: 
+     1. Go to Firebase Console → Settings → Usage and billing
+     2. Upgrade to Blaze plan (Pay as you go)
+     3. Run: `firebase deploy --only storage`
+     4. Test profile photo upload in app
+   - **Cost**: Firebase Blaze has generous free tier (5GB storage, 1GB download/day)
+   - **Status**: ⏳ Pending upgrade decision
+
+### Non-Critical Issues
+- None currently
+
+---
 
 ### Phase 2: Advanced Features
 
