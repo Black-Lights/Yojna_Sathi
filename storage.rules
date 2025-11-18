@@ -2,21 +2,47 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     
-    // Documents - users can only read/write their own documents
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') 
+             && request.resource.size < 5 * 1024 * 1024; // Max 5MB
+    }
+    
+    function isValidDocument() {
+      return request.resource.contentType.matches('(image/.*|application/pdf)')
+             && request.resource.size < 10 * 1024 * 1024; // Max 10MB
+    }
+    
+    // Profile photos - users can read/write their own profile photo
+    match /profile_photos/{userId}.jpg {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isValidImage();
+    }
+    
+    // Application documents - users can only read/write their own documents
     match /documents/{userId}/{schemeId}/{fileName} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidDocument();
     }
     
-    // Videos and images - public read
-    match /videos/{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if false; // Only admins
+    // Tutorial videos and thumbnails - public read for authenticated users
+    match /tutorials/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins via Cloud Functions
     }
     
-    match /images/{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if false; // Only admins
+    // Scheme images - public read for authenticated users
+    match /scheme_images/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins via Cloud Functions
     }
   }
 }
