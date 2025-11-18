@@ -19,10 +19,10 @@ service cloud.firestore {
       allow delete: if isOwner(userId);
     }
     
-    // Schemes collection - public read, admin write
+    // Schemes collection - public read, authenticated write (for development)
     match /schemes/{schemeId} {
       allow read: if isAuthenticated();
-      allow write: if false; // Only admins through Cloud Functions
+      allow write: if isAuthenticated(); // TODO: Restrict to admins only in production
     }
     
     // User schemes collection
