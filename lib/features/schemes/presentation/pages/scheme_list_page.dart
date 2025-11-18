@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/di/injection_container.dart';
 import '../bloc/schemes_bloc.dart';
 import '../../data/models/scheme.dart';
@@ -13,11 +14,20 @@ class SchemeListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    
     return BlocProvider(
-      create: (context) => sl<SchemesBloc>()
-        ..add(category != null
-            ? FilterSchemesByCategoryEvent(category!)
-            : LoadSchemesEvent()),
+      create: (context) {
+        final bloc = sl<SchemesBloc>();
+        if (eligibleOnly && userId != null) {
+          bloc.add(LoadEligibleSchemesEvent(userId));
+        } else if (category != null) {
+          bloc.add(FilterSchemesByCategoryEvent(category!));
+        } else {
+          bloc.add(LoadSchemesEvent());
+        }
+        return bloc;
+      },
       child: SchemeListView(
         category: category,
         eligibleOnly: eligibleOnly,
@@ -51,18 +61,26 @@ class _SchemeListViewState extends State<SchemeListView> {
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category ?? 'All Schemes'),
+        title: Text(
+          widget.eligibleOnly
+              ? 'For You'
+              : (widget.category ?? 'All Schemes'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<SchemesBloc>().add(
-                    widget.category != null
-                        ? FilterSchemesByCategoryEvent(widget.category!)
-                        : LoadSchemesEvent(),
-                  );
+              if (widget.eligibleOnly && userId != null) {
+                context.read<SchemesBloc>().add(LoadEligibleSchemesEvent(userId));
+              } else if (widget.category != null) {
+                context.read<SchemesBloc>().add(FilterSchemesByCategoryEvent(widget.category!));
+              } else {
+                context.read<SchemesBloc>().add(LoadSchemesEvent());
+              }
             },
           ),
         ],
@@ -185,7 +203,11 @@ class _SchemeListViewState extends State<SchemeListView> {
                     itemCount: state.schemes.length,
                     itemBuilder: (context, index) {
                       final scheme = state.schemes[index];
-                      return _SchemeCard(scheme: scheme);
+                      final eligibilityScore = state.eligibilityScores?[scheme.schemeId];
+                      return _SchemeCard(
+                        scheme: scheme,
+                        eligibilityScore: eligibilityScore,
+                      );
                     },
                   );
                 }
@@ -202,8 +224,12 @@ class _SchemeListViewState extends State<SchemeListView> {
 
 class _SchemeCard extends StatelessWidget {
   final Scheme scheme;
+  final double? eligibilityScore;
 
-  const _SchemeCard({required this.scheme});
+  const _SchemeCard({
+    required this.scheme,
+    this.eligibilityScore,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -224,21 +250,54 @@ class _SchemeCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Category Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _getCategoryColor(scheme.category),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  scheme.category,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              // Category Badge and Eligibility Badge
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(scheme.category),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      scheme.category,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  if (eligibilityScore != null && eligibilityScore! > 0.3) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getEligibilityColor(eligibilityScore!),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _getEligibilityIcon(eligibilityScore!),
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _getEligibilityLabel(eligibilityScore!),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 12),
 
@@ -340,5 +399,26 @@ class _SchemeCard extends StatelessWidget {
       return '${(amount / 1000).toStringAsFixed(1)} K';
     }
     return amount.toStringAsFixed(0);
+  }
+
+  Color _getEligibilityColor(double score) {
+    if (score >= 0.9) return Colors.green;
+    if (score >= 0.7) return Colors.lightGreen;
+    if (score >= 0.5) return Colors.orange;
+    return Colors.grey;
+  }
+
+  IconData _getEligibilityIcon(double score) {
+    if (score >= 0.9) return Icons.verified;
+    if (score >= 0.7) return Icons.check_circle;
+    if (score >= 0.5) return Icons.info;
+    return Icons.help_outline;
+  }
+
+  String _getEligibilityLabel(double score) {
+    if (score >= 0.9) return 'Highly Eligible';
+    if (score >= 0.7) return 'Eligible';
+    if (score >= 0.5) return 'Partially Eligible';
+    return 'Check Requirements';
   }
 }

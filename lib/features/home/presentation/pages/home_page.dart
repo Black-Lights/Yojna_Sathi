@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../config/routes/app_router.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../schemes/presentation/bloc/schemes_bloc.dart';
+import '../../../schemes/data/models/scheme.dart';
+import '../../../schemes/presentation/pages/scheme_detail_page.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
 class HomePage extends StatefulWidget {
@@ -65,6 +68,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHomeTab() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -86,7 +91,35 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          
+          // For You Section - Personalized Recommendations
+          if (userId != null) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'For You',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRouter.schemeList,
+                      arguments: {'eligibleOnly': true},
+                    );
+                  },
+                  child: const Text('View All'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _buildForYouSection(userId),
+            const SizedBox(height: 24),
+          ],
+          
           Text(
             'Categories',
             style: Theme.of(context).textTheme.titleLarge,
@@ -96,6 +129,183 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Widget _buildForYouSection(String userId) {
+    return BlocProvider(
+      create: (context) => sl<SchemesBloc>()..add(LoadEligibleSchemesEvent(userId)),
+      child: BlocBuilder<SchemesBloc, SchemesState>(
+        builder: (context, state) {
+          if (state is SchemesLoading) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (state is SchemesError) {
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.orange),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Complete your profile to get personalized recommendations',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRouter.profileEdit);
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Complete Profile'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is SchemesLoaded) {
+            if (state.schemes.isEmpty) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.search_off, size: 48, color: Colors.grey),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No eligible schemes found. Update your profile for better matches.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            // Show top 3 eligible schemes
+            final topSchemes = state.schemes.take(3).toList();
+            return Column(
+              children: topSchemes.map((scheme) {
+                final eligibilityScore = state.eligibilityScores?[scheme.schemeId];
+                return _buildRecommendedSchemeCard(scheme, eligibilityScore);
+              }).toList(),
+            );
+          }
+
+          return const SizedBox();
+        },
+      ),
+    );
+  }
+
+  Widget _buildRecommendedSchemeCard(Scheme scheme, double? eligibilityScore) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 3,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SchemeDetailPage(schemeId: scheme.schemeId),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (eligibilityScore != null && eligibilityScore > 0.7)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: eligibilityScore >= 0.9 ? Colors.green : Colors.lightGreen,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            eligibilityScore >= 0.9 ? Icons.verified : Icons.check_circle,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${(eligibilityScore * 100).toInt()}% Match',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                scheme.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                scheme.description,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (scheme.benefits.amount != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.currency_rupee, size: 14, color: Colors.green),
+                    Text(
+                      '₹${_formatAmount(scheme.benefits.amount!)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatAmount(double amount) {
+    if (amount >= 10000000) {
+      return '${(amount / 10000000).toStringAsFixed(1)} Cr';
+    } else if (amount >= 100000) {
+      return '${(amount / 100000).toStringAsFixed(1)} L';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(1)} K';
+    }
+    return amount.toStringAsFixed(0);
   }
 
   Widget _buildCategoryGrid() {

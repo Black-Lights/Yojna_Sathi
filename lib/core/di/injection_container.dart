@@ -51,7 +51,11 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<SchemesService>(
-    () => SchemesService(sl()),
+    () => SchemesService(
+      sl(),
+      eligibilityService: sl(),
+      profileService: sl(),
+    ),
   );
 
   sl.registerLazySingleton<ApplicationsService>(

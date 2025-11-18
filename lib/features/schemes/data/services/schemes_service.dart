@@ -1,11 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/services/eligibility_service.dart';
+import '../../../profile/data/services/profile_service.dart';
 import '../models/scheme.dart';
 
 class SchemesService {
   final FirebaseFirestore _firestore;
+  final EligibilityService? _eligibilityService;
+  final ProfileService? _profileService;
 
-  SchemesService(this._firestore);
+  SchemesService(
+    this._firestore, {
+    EligibilityService? eligibilityService,
+    ProfileService? profileService,
+  })  : _eligibilityService = eligibilityService,
+        _profileService = profileService;
 
   Future<List<Scheme>> getAllSchemes() async {
     try {
@@ -168,6 +177,54 @@ class SchemesService {
       await batch.commit();
     } catch (e) {
       throw Exception('Failed to add multiple schemes: $e');
+    }
+  }
+
+  /// Get eligible schemes for a user with eligibility scores
+  Future<Map<String, dynamic>> getEligibleSchemes(String userId) async {
+    if (_eligibilityService == null || _profileService == null) {
+      throw Exception('EligibilityService and ProfileService required for this operation');
+    }
+
+    try {
+      // Get user profile
+      final userProfile = await _profileService!.getProfile(userId);
+      if (userProfile == null) {
+        throw Exception('User profile not found');
+      }
+
+      // Get all schemes
+      final allSchemes = await getAllSchemes();
+
+      // Calculate eligibility for each scheme
+      final Map<String, double> eligibilityScores = {};
+      final eligibleSchemes = <Scheme>[];
+
+      for (final scheme in allSchemes) {
+        final result = _eligibilityService!.checkEligibility(userProfile, scheme);
+        
+        // Store score for all schemes
+        eligibilityScores[scheme.schemeId] = result.matchScore;
+        
+        // Include schemes with score > 0.3 (30% match or higher)
+        if (result.matchScore > 0.3) {
+          eligibleSchemes.add(scheme);
+        }
+      }
+
+      // Sort by eligibility score (highest first)
+      eligibleSchemes.sort((a, b) {
+        final scoreA = eligibilityScores[a.schemeId] ?? 0.0;
+        final scoreB = eligibilityScores[b.schemeId] ?? 0.0;
+        return scoreB.compareTo(scoreA);
+      });
+
+      return {
+        'schemes': eligibleSchemes,
+        'scores': eligibilityScores,
+      };
+    } catch (e) {
+      throw Exception('Failed to get eligible schemes: $e');
     }
   }
 }

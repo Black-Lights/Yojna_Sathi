@@ -39,6 +39,15 @@ class FilterSchemesByCategoryEvent extends SchemesEvent {
   List<Object?> get props => [category];
 }
 
+class LoadEligibleSchemesEvent extends SchemesEvent {
+  final String userId;
+
+  LoadEligibleSchemesEvent(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
+
 // States
 abstract class SchemesState extends Equatable {
   @override
@@ -51,11 +60,12 @@ class SchemesLoading extends SchemesState {}
 
 class SchemesLoaded extends SchemesState {
   final List<Scheme> schemes;
+  final Map<String, double>? eligibilityScores;
 
-  SchemesLoaded(this.schemes);
+  SchemesLoaded(this.schemes, {this.eligibilityScores});
 
   @override
-  List<Object?> get props => [schemes];
+  List<Object?> get props => [schemes, eligibilityScores];
 }
 
 class SchemeDetailLoaded extends SchemesState {
@@ -87,6 +97,7 @@ class SchemesBloc extends Bloc<SchemesEvent, SchemesState> {
     on<LoadSchemeDetailEvent>(_onLoadSchemeDetail);
     on<SearchSchemesEvent>(_onSearchSchemes);
     on<FilterSchemesByCategoryEvent>(_onFilterSchemesByCategory);
+    on<LoadEligibleSchemesEvent>(_onLoadEligibleSchemes);
   }
 
   Future<void> _onLoadSchemes(
@@ -140,6 +151,19 @@ class SchemesBloc extends Bloc<SchemesEvent, SchemesState> {
     try {
       final schemes = await _schemesService.getSchemesByCategory(event.category);
       emit(SchemesLoaded(schemes));
+    } catch (e) {
+      emit(SchemesError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadEligibleSchemes(
+    LoadEligibleSchemesEvent event,
+    Emitter<SchemesState> emit,
+  ) async {
+    emit(SchemesLoading());
+    try {
+      final result = await _schemesService.getEligibleSchemes(event.userId);
+      emit(SchemesLoaded(result['schemes'], eligibilityScores: result['scores']));
     } catch (e) {
       emit(SchemesError(e.toString()));
     }
